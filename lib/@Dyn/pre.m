@@ -1,0 +1,56 @@
+function [ X0 ] = pre(dyn, X, rho)
+  % Compute set
+  % {x : ∀ p ∃ u ∀ d, x(t+1) + B(rho) ⊆ X}
+  % using normal intersection/projection method
+
+  if ~isa(dyn, 'Dyn')
+    error('dyn must be an instance of Dyn');
+  end
+
+  if nargin < 3
+    rho = 0;
+  end
+
+  if length(rho) == 1
+    rho = rho * ones(dyn.nx,1);
+  end
+
+  Xb = X - Polyhedron('A', [eye(dyn.nx); -eye(dyn.nx)], 'b', repmat(rho,2,1));
+
+  X0_A = zeros(0, dyn.nx);
+  X0_b = ones(0,1);
+
+  for ip=1:size(dyn.PV,1)
+    p = dyn.PV(ip, :);
+
+    A_mat_p = zeros(dyn.nx, dyn.nx);
+    F_mat_p = zeros(dyn.nx, 1);
+    for jp=1:dyn.np
+      A_mat_p = A_mat_p + dyn.Ap{jp} * p(jp);
+      F_mat_p = F_mat_p + dyn.Fp{jp} * p(jp);
+    end
+
+    Xd_A = zeros(0, dyn.nx+dyn.nu);
+    Xd_b = zeros(0, 1);
+
+    for id=1:size(dyn.DV,1)
+      d = dyn.DV(id, :);
+      A_mat_pd = A_mat_p;
+      F_mat_pd = F_mat_p;
+      for jd=1:dyn.nd
+        A_mat_pd = A_mat_pd + dyn.Ad{jd} * d(jd);
+        F_mat_pd = F_mat_pd + dyn.Fd{jd} * d(jd);
+      end
+      Xd_A = [Xd_A; Xb.A*[A_mat_pd dyn.B]];
+      Xd_b = [Xd_b; Xb.b - Xb.A*F_mat_pd];
+    end
+
+    pre_proj = Polyhedron('A', [Xd_A; dyn.XU.A], ...
+                          'b', [Xd_b; dyn.XU.b]);
+    
+    proj = projection(pre_proj, 1:dyn.nx);
+    X0_A = [X0_A; proj.A]
+    X0_b = [X0_b; proj.b]
+  end
+  X0 = Polyhedron('A', X0_A, 'b', X0_b);
+end
