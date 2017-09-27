@@ -24,7 +24,11 @@ function [X0] = pre_rc(dyn, X, rho)
     error('state-dependent disturbance not supported yet')
   end
 
-  if norm(dyn.E) > 0
+  if norm(dyn.Ew) > 0
+    error('E w disturbance not supported yet')
+  end
+
+  if norm(dyn.Ev) > 0
     error('E w disturbance not supported yet')
   end
 

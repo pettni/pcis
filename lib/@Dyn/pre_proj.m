@@ -25,9 +25,25 @@ function [ X0 ] = pre_proj(dyn, X, rho)
   PV = dyn.P.V;
   DV = dyn.D.V;
 
-  parfor ip=1:max(1, size(PV,1))
+  N_P = max(1, size(PV,1));       % number of p vertices
+  N_V = max(1, length(dyn.XV_V)); % number of v vertices
+
+  proj = cell(N_P * N_V, 1);
+
+  parfor iter=1:N_P*N_V
+    ip = 1+mod(iter-1, N_P);    % idx p
+    iv = 1+floor((iter-1)/N_P); % idx v
+
     A_mat_p = dyn.A;
     F_mat_p = zeros(dyn.nx, 1);
+
+    if dyn.nv > 0
+      vext_x = dyn.XV_V{iv}(:, 1:dyn.nx);
+      vext_v = dyn.XV_V{iv}(:, dyn.nx+1:end);
+      A_mat_p = A_mat_p + dyn.Ev * vext_x;
+      F_mat_p = F_mat_p + dyn.Ev * vext_v;
+    end
+
     for jp=1:dyn.np
       A_mat_p = A_mat_p + dyn.Ap{jp} * PV(ip, jp);
       F_mat_p = F_mat_p + dyn.Fp{jp} * PV(ip, jp);
@@ -48,9 +64,9 @@ function [ X0 ] = pre_proj(dyn, X, rho)
           wext_x = dyn.XW_V{iw}(:, 1:dyn.nx);
           wext_w = dyn.XW_V{iw}(:, dyn.nx+1:end);
           Xd_A = [Xd_A; 
-                  Xb.A*[A_mat_pd+dyn.E*wext_x dyn.B]];
+                  Xb.A*[A_mat_pd+dyn.Ew*wext_x dyn.B]];
           Xd_b = [Xd_b; 
-                  Xb.b-Xb.A*(F_mat_pd+dyn.E*wext_w)];
+                  Xb.b-Xb.A*(F_mat_pd+dyn.Ew*wext_w)];
         end
       else
         Xd_A = [Xd_A; 
@@ -62,12 +78,10 @@ function [ X0 ] = pre_proj(dyn, X, rho)
     pre_proj = Polyhedron('A', [Xd_A; dyn.XU.A], ...
                           'b', [Xd_b; dyn.XU.b]);
     
-    proj = projection(pre_proj, 1:dyn.nx);
-    proj.minHRep;
-
-    X0_A = [X0_A; proj.A];
-    X0_b = [X0_b; proj.b];
+    proj{iter} = projection(pre_proj, 1:dyn.nx);
+    proj{iter}.minHRep;
   end
-  X0 = Polyhedron('H', [X0_A X0_b]);
+
+  X0 = Polyhedron('H', cell2mat(cellfun(@(p) p.H, proj, 'UniformOutput', false)));
   X0.minHRep;
 end
