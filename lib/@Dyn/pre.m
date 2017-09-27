@@ -20,23 +20,26 @@ function [ X0 ] = pre(dyn, X, rho)
   X0_A = zeros(0, dyn.nx);
   X0_b = ones(0,1);
 
-  for ip=1:max(1, size(dyn.PV,1))
+  PV = dyn.P.V;
+  DV = dyn.D.V;
+
+  for ip=1:max(1, size(PV,1))
     A_mat_p = dyn.A;
     F_mat_p = zeros(dyn.nx, 1);
     for jp=1:dyn.np
-      A_mat_p = A_mat_p + dyn.Ap{jp} * dyn.PV(ip, jp);
-      F_mat_p = F_mat_p + dyn.Fp{jp} * dyn.PV(ip, jp);
+      A_mat_p = A_mat_p + dyn.Ap{jp} * PV(ip, jp);
+      F_mat_p = F_mat_p + dyn.Fp{jp} * PV(ip, jp);
     end
 
     Xd_A = zeros(0, dyn.nx+dyn.nu);
     Xd_b = zeros(0, 1);
 
-    for id=1:max(1, size(dyn.DV,1))
+    for id=1:max(1, size(DV,1))
       A_mat_pd = A_mat_p;
       F_mat_pd = F_mat_p;
       for jd=1:dyn.nd
-        A_mat_pd = A_mat_pd + dyn.Ad{jd} * dyn.DV(id, jd);
-        F_mat_pd = F_mat_pd + dyn.Fd{jd} * dyn.DV(id, jd);
+        A_mat_pd = A_mat_pd + dyn.Ad{jd} * DV(id, jd);
+        F_mat_pd = F_mat_pd + dyn.Fd{jd} * DV(id, jd);
       end
       Xd_A = [Xd_A; Xb.A*[A_mat_pd dyn.B]];
       Xd_b = [Xd_b; Xb.b-Xb.A*F_mat_pd];

@@ -2,7 +2,7 @@
 
 This is an ongoing effort to combine code for polyhedral synthesis methods (subsume the repositories `cps-inv`, `multi-cinv` and parts of `mkz`). Targeted list of capabilities:
 
- - Pre algorithms via robust counterpart (x) and intersection
+ - Pre algorithms via robust counterpart and intersection
  - Invariance algorithms with termination guarantees (x)
  - Measurable and non-measurable disturbance
  - Disturbance affecting A matrix
@@ -11,7 +11,8 @@ This is an ongoing effort to combine code for polyhedral synthesis methods (subs
 ## TODO list
 
  - Implement things marked with (x) above
- - Include tests
+ - Add 3D ACC example
+ - Add LK/ACC example
 
 ## Longer term objectives
 

@@ -3,27 +3,27 @@ classdef Dyn
   %  
   % Create discrete-time system of the form
   %
-  %  x(k+1) = (∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u + ∑d_i Fd{i} + ∑p_i Fp{i}
+  %  x(k+1) = (A + ∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u + ∑d_i Fd{i} + ∑p_i Fp{i}
   %
   % (x(k),u(k)) ∈ XU input
-  % p ∈ conv(PV) measurable disturbance
-  % d ∈ conv(DV) non-measurable disturbance
+  % p ∈ P measurable disturbance
+  % d ∈ D non-measurable disturbance
   %
   properties (SetAccess=protected)
     A;
     B;
     Ap;
     Fp;
-    PV;
+    P;
     XU;
     Ad;
     Fd;
-    DV;
+    D;
   end
 
   methods
     % Constructor
-    function d = Dyn(A, B, XU, Ap, Fp, PV, Ad, Fd, DV)
+    function d = Dyn(A, B, XU, Ap, Fp, P, Ad, Fd, D)
 
       nx = size(A,2);
 
@@ -40,27 +40,27 @@ classdef Dyn
       if nargin < 4 || isempty(Ap)
         d.Ap = {};
         d.Fp = {};
-        d.PV = []; 
+        d.P = Polyhedron; 
       else
         d.Ap = Ap;
         d.Fp = Fp;
-        d.PV = PV;
+        d.P = P;
       end
 
       if nargin < 7 || isempty(Ad)
         d.Ad = {};
         d.Fd = {};
-        d.DV = []; 
+        d.D = Polyhedron; 
       else
         d.Ad = Ad;
         d.Fd = Fd;
-        d.DV = DV;
+        d.D = D;
       end
 
-      assert(length(d.Ap) == size(d.PV,2))
-      assert(length(d.Fp) == size(d.PV,2))
-      assert(length(d.Ad) == size(d.DV,2))
-      assert(length(d.Fd) == size(d.DV,2))
+      assert(length(d.Ap) == d.P.Dim)
+      assert(length(d.Fp) == d.P.Dim)
+      assert(length(d.Ad) == d.D.Dim)
+      assert(length(d.Fd) == d.D.Dim)
     end
 
     function n = nx(d)

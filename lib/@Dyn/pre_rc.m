@@ -1,24 +1,12 @@
 %% pre_rc: pre using robust counterpart
 function [X0] = pre_rc(dyn, X)
 
-	P = Polyhedron('V', dyn.PV);
-	PA = [P.A; P.Ae; -P.Ae];
-	Pb = [P.b; P.be; -P.be];
-	P = Polyhedron('A', PA, 'b', Pb);
-	P.minHRep;
-
-	D = Polyhedron('V', dyn.DV);
-	DA = [D.A; D.Ae; -D.Ae];
-	Db = [D.b; D.be; -D.be];
-	D = Polyhedron('A', DA, 'b', Db);
-	D.minHRep;
-
 	if norm(dyn.XU.A(:, 1:dyn.nx)) > 0
-		error('not supported yet')
+		error('state-dependent disturbance not supported yet')
 	end
 
 	X0 = pre_mat(dyn.A, dyn.Ap', dyn.Ad', dyn.B, dyn.Fp', dyn.Fd', ...
-				   X.A, X.b, P.A, P.b, D.A, D.b, ...
+				   X.A, X.b, dyn.P.A, dyn.P.b, dyn.D.A, dyn.D.b, ...
 				   dyn.XU.A(:, dyn.nx+1:end), dyn.XU.b);
 end
 
