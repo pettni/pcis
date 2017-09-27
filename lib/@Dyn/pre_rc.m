@@ -1,5 +1,9 @@
-%% pre_rc: pre using robust counterpart
 function [X0] = pre_rc(dyn, X, rho)
+  % Compute inner approximation of set
+  % {x : ∀ p ∃ u ∀ d, x(t+1) + Ball(rho) ⊆ X}
+  % using robust counterpart method
+  %
+  % Reference: Petter Nilsson Ph.D. thesis (2017), Theorem 3.5
 
   if ~isa(dyn, 'Dyn')
     error('dyn must be an instance of Dyn');
@@ -18,6 +22,10 @@ function [X0] = pre_rc(dyn, X, rho)
 
   if norm(dyn.XU.A(:, 1:dyn.nx)) > 0
     error('state-dependent disturbance not supported yet')
+  end
+
+  if norm(dyn.E) > 0
+    error('E w disturbance not supported yet')
   end
 
   X0 = pre_mat(dyn.A, dyn.Ap', dyn.Ad', dyn.B, dyn.Fp', dyn.Fd', ...

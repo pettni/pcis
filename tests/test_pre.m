@@ -65,6 +65,12 @@ function testPre(testCase)
   testCase.assertThat(dyn8.pre(X) == Polyhedron([eye(2); -eye(2)], [.4; .6; .4; .6]), ...
                       matlab.unittest.constraints.IsTrue);
 
+  % State-dependent disturbance
+  dyn9 = Dyn(eye(2), [], [], [], [], [], [], [], [], ...
+             [0; 1], {[0.5 0 0.1], [-0.5 0 -0.1]});
+  X = Polyhedron([eye(2); -eye(2)], [4; 2; 0; 2]);
+  testCase.assertThat(dyn9.pre(X) == Polyhedron('V', [0 1.9; 0 -1.9; 3.8 0]), ...
+                      matlab.unittest.constraints.IsTrue);
 end
 
 %% Test Functions
