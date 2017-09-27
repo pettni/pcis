@@ -11,7 +11,7 @@ classdef Dyn
   % v(k) ∈ conv_i(XV_V{i} [x(k); 1]) measurable state-dependent disturbance
   % w(k) ∈ conv_i(XW_V{i} [x(k); 1]) non-measurable state-dependent disturbance
   %
-  % INPUTS:
+  % INPUTS (all except A are optional)
   %
   % A: (nx x nx) matrix
   % B: (nx x nu) matrix
@@ -29,7 +29,7 @@ classdef Dyn
   %
   % XV_V: cell of matrices of size (nv x nx+1)  
   % XW_V: cell of matrices of size (nw x nx+1)  
-  properties (SetAccess=protected)
+  properties
     A;
     B;
     XU;
@@ -96,8 +96,9 @@ classdef Dyn
         d.Ew = Ew;
         d.XW_V = XW_V;
       end
+    end
 
-
+    function check(d)
       % Checks
       assert(size(d.A, 1) == size(d.A,2))
       assert(size(d.B, 1) == size(d.A,1))
@@ -134,7 +135,6 @@ classdef Dyn
         assert(size(d.Ew,2) == size(d.XW_V{i}, 1))
         assert(size(d.A,2)+1 == size(d.XW_V{i}, 2))
       end
-
     end
 
     function n = nx(d)
@@ -156,6 +156,7 @@ classdef Dyn
       n = size(d.Ev,2);
     end
     function X0 = pre(d, X, rho)
+      d.check();
       if nargin < 3
         rho = 0;
       end

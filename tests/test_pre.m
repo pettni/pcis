@@ -5,38 +5,38 @@ end
 
 %% Test Functions
 function testPre(testCase)
-  % Identity system
+  % Identity systems
   A = eye(2);
-  dyn1 = Dyn(A);
-  dyn1p = Dyn(-A);
+  dyn = Dyn(A);
 
   X = Polyhedron('A', [eye(2); -eye(2)], 'b', ones(4,1));
+  testCase.assertThat(dyn.pre(X) == X, matlab.unittest.constraints.IsTrue);
 
-  testCase.assertThat(dyn1.pre(X) == X, matlab.unittest.constraints.IsTrue);
-  testCase.assertThat(dyn1p.pre(X) == X, matlab.unittest.constraints.IsTrue);
+  dyn.A = -dyn.A;
+  testCase.assertThat(dyn.pre(X) == X, matlab.unittest.constraints.IsTrue);
 
   % With control
-  XU = Polyhedron('H', [0 0 1 0 0.1; 0 0 0 1 0.1; 0 0 -1 0 0.1; 0 0 0 -1 0.1]);
-  dyn3 = Dyn(A, eye(2), XU);
+  dyn.B = eye(2);
+  dyn.XU = Polyhedron('H', [0 0 1 0 0.1; 0 0 0 1 0.1; 0 0 -1 0 0.1; 0 0 0 -1 0.1]);
 
-  testCase.assertThat(dyn3.pre(X) == Polyhedron([eye(2); -eye(2)], 1.1*ones(4,1)), ...
+  testCase.assertThat(dyn.pre(X) == Polyhedron([eye(2); -eye(2)], 1.1*ones(4,1)), ...
                       matlab.unittest.constraints.IsTrue);
 
   % With control and non-measurable disturbance
-  dyn4 = Dyn(A, eye(2), XU, [], [], [],...
-             {zeros(2,2)}, {[1;0]}, Polyhedron('V', [0.1; -0.1]));
+  dyn.Ad = {zeros(2,2)};
+  dyn.Fd = {[1;0]};
+  dyn.D = Polyhedron('V', [0.1; -0.1]);
 
-  testCase.assertThat(dyn4.pre(X) == Polyhedron([eye(2); -eye(2)], [1; 1.1; 1; 1.1]), ...
+  testCase.assertThat(dyn.pre(X) == Polyhedron([eye(2); -eye(2)], [1; 1.1; 1; 1.1]), ...
                       matlab.unittest.constraints.IsTrue);
 
   % With 1D measurable disturbance
   XU = Polyhedron('H', [0 0 1 0 1; 0 0 0 1 1; 0 0 -1 0 1; 0 0 0 -1 1]);
-  dyn5 = Dyn(A, eye(2), XU, ...
+  dyn = Dyn(A, eye(2), XU, ...
              {zeros(2,2)}, {[1;0]}, ...
-             Polyhedron('V', [1.1; -1.1]), ...
-             [], [], []);
+             Polyhedron('V', [1.1; -1.1]));
 
-  testCase.assertThat(dyn5.pre(X) == Polyhedron([eye(2); -eye(2)], [0.9; 2; 0.9; 2]), ...
+  testCase.assertThat(dyn.pre(X) == Polyhedron([eye(2); -eye(2)], [0.9; 2; 0.9; 2]), ...
                        matlab.unittest.constraints.IsTrue);
 
   % With 2D measurable disturbance
@@ -66,20 +66,17 @@ function testPre(testCase)
                       matlab.unittest.constraints.IsTrue);
 
   % State-dependent non-measurable disturbance
-  dyn9 = Dyn(eye(2), [], [], ...
-             [], [], [], ...
-             [], [], [], ...
-             [], [],...
-             [0; 1], {[0.5 0 0.1], [-0.5 0 -0.1]});
+  dyn9 = Dyn(eye(2));
+  dyn9.Ew = [0;1];
+  dyn9.XW_V = {[0.5 0 0.1], [-0.5 0 -0.1]};
   X = Polyhedron([eye(2); -eye(2)], [4; 2; 0; 2]);
   testCase.assertThat(dyn9.pre(X) == Polyhedron('V', [0 1.9; 0 -1.9; 3.8 0]), ...
                       matlab.unittest.constraints.IsTrue);
 
   % State-dependent measurable disturbance
-  dyn10 = Dyn(eye(2), [], [], ...
-              [], [], [], ...
-              [], [], [], ...
-              [0; 1], {[0.5 0 0.1], [-0.5 0 -0.1]});
+  dyn10 = Dyn(eye(2));
+  dyn10.Ev = [0;1];
+  dyn10.XV_V = {[0.5 0 0.1], [-0.5 0 -0.1]};
   X = Polyhedron([eye(2); -eye(2)], [4; 2; 0; 2]);
   testCase.assertThat(dyn10.pre(X) == Polyhedron('V', [0 1.9; 0 -1.9; 3.8 0]), ...
                       matlab.unittest.constraints.IsTrue);
