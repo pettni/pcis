@@ -38,8 +38,8 @@ classdef Dyn
       d.Fp = Fp;
 
       if nargin < 3
-        assert length(Ap) == 1
-        d.PV = 1 
+        assert(length(Ap) == 1);
+        d.PV = 1 ;
       else
         d.PV = PV;
       end
@@ -62,10 +62,10 @@ classdef Dyn
         d.DV = DV;
       end
 
-      assert(length(d.Ap) == size(d.PV,1))
-      assert(length(d.Fp) == size(d.PV,1))
-      assert(length(d.Ad) == size(d.DV,1))
-      assert(length(d.Fd) == size(d.DV,1))
+      assert(length(d.Ap) == size(d.PV,2))
+      assert(length(d.Fp) == size(d.PV,2))
+      assert(length(d.Ad) == size(d.DV,2))
+      assert(length(d.Fd) == size(d.DV,2))
     end
 
     function n = nx(d)

@@ -21,36 +21,32 @@ function [ X0 ] = pre(dyn, X, rho)
   X0_b = ones(0,1);
 
   for ip=1:size(dyn.PV,1)
-    p = dyn.PV(ip, :);
-
     A_mat_p = zeros(dyn.nx, dyn.nx);
     F_mat_p = zeros(dyn.nx, 1);
     for jp=1:dyn.np
-      A_mat_p = A_mat_p + dyn.Ap{jp} * p(jp);
-      F_mat_p = F_mat_p + dyn.Fp{jp} * p(jp);
+      A_mat_p = A_mat_p + dyn.Ap{jp} * dyn.PV(ip, jp);
+      F_mat_p = F_mat_p + dyn.Fp{jp} * dyn.PV(ip, jp);
     end
 
     Xd_A = zeros(0, dyn.nx+dyn.nu);
     Xd_b = zeros(0, 1);
 
     for id=1:size(dyn.DV,1)
-      d = dyn.DV(id, :);
       A_mat_pd = A_mat_p;
       F_mat_pd = F_mat_p;
       for jd=1:dyn.nd
-        A_mat_pd = A_mat_pd + dyn.Ad{jd} * d(jd);
-        F_mat_pd = F_mat_pd + dyn.Fd{jd} * d(jd);
+        A_mat_pd = A_mat_pd + dyn.Ad{jd} * dyn.DV(id, jd);
+        F_mat_pd = F_mat_pd + dyn.Fd{jd} * dyn.DV(id, jd);
       end
       Xd_A = [Xd_A; Xb.A*[A_mat_pd dyn.B]];
-      Xd_b = [Xd_b; Xb.b - Xb.A*F_mat_pd];
+      Xd_b = [Xd_b; Xb.b-Xb.A*F_mat_pd];
     end
-
     pre_proj = Polyhedron('A', [Xd_A; dyn.XU.A], ...
                           'b', [Xd_b; dyn.XU.b]);
     
     proj = projection(pre_proj, 1:dyn.nx);
-    X0_A = [X0_A; proj.A]
-    X0_b = [X0_b; proj.b]
+    X0_A = [X0_A; proj.A];
+    X0_b = [X0_b; proj.b];
   end
-  X0 = Polyhedron('A', X0_A, 'b', X0_b);
+  X0 = Polyhedron('H', [X0_A X0_b]);
 end
