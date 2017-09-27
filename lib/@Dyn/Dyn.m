@@ -1,27 +1,20 @@
 classdef Dyn
-  % DYN: Create a Dyn object.
-  % ========================================
+  % Dyn(Ap, Fp, P, B, XU, Ad, Fd, D): 
+  %  
+  % Create discrete-time system of the form
   %
-  % SYNTAX
-  % ------
+  %  x(k+1) = (∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u + ∑d_i Fd{i} + ∑p_i Fp{i}
   %
-  %   dyn = Dyn(Ap, Fp, P, B, XU, Ad, Fd, D)
-  % 
-  % DESCRIPTION
-  % ------    
-  %   Discrete-time system of the form 
-  %
-  %  x(t+1) = (∑d_i Ad{i} + ∑p_i Ap{i}) x(t) + B u + ∑d_i Fd{i} + ∑p_i Fp{i}
-  %
-  % (x,u) ∈ XU input
+  % (x(k),u(k)) ∈ XU input
   % p ∈ conv(PV) measurable disturbance
   % d ∈ conv(DV) non-measurable disturbance
   %
   properties (SetAccess=protected)
+    A;
+    B;
     Ap;
     Fp;
     PV;
-    B;
     XU;
     Ad;
     Fd;
@@ -30,32 +23,34 @@ classdef Dyn
 
   methods
     % Constructor
-    function d = Dyn(Ap, Fp, PV, B, XU, Ad, Fd, DV)
+    function d = Dyn(A, B, XU, Ap, Fp, PV, Ad, Fd, DV)
 
-      nx = size(Ap{1},2);
+      nx = size(A,2);
 
-      d.Ap = Ap;
-      d.Fp = Fp;
+      d.A = A;
 
-      if nargin < 3
-        assert(length(Ap) == 1);
-        d.PV = 1 ;
-      else
-        d.PV = PV;
-      end
-
-      if nargin < 4
-        d.B = zeros(nx, 0);
+      if nargin < 2 || isempty(B)
+        d.B = zeros(nx,0);
         d.XU = Polyhedron('H', [zeros(1,nx) 1]);
       else
         d.B = B;
         d.XU = XU;
       end
 
-      if nargin < 7
-        d.Ad = {zeros(nx, nx)};
-        d.Fd = {zeros(nx, 1)};
-        d.DV = 1; 
+      if nargin < 4 || isempty(Ap)
+        d.Ap = {};
+        d.Fp = {};
+        d.PV = []; 
+      else
+        d.Ap = Ap;
+        d.Fp = Fp;
+        d.PV = PV;
+      end
+
+      if nargin < 7 || isempty(Ad)
+        d.Ad = {};
+        d.Fd = {};
+        d.DV = []; 
       else
         d.Ad = Ad;
         d.Fd = Fd;
@@ -69,7 +64,7 @@ classdef Dyn
     end
 
     function n = nx(d)
-      n = size(d.Ap{1},2);
+      n = size(d.A,2);
     end
     function n = nu(d)
       n = size(d.B,2);
