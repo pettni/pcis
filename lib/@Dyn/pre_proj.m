@@ -36,7 +36,7 @@ function [ X0 ] = pre_proj(dyn, X, rho)
     iv = 1+floor((iter-1)/N_P); % idx v
 
     A_mat_p = dyn.A;
-    F_mat_p = zeros(dyn.nx, 1);
+    F_mat_p = dyn.F;
 
     if dyn.nv > 0
       vext_x = dyn.XV_V{iv}(:, 1:dyn.nx);
