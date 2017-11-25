@@ -1,5 +1,5 @@
 classdef Dyn
-  % Dyn(A, F, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XV_V, Ew, XW_V): 
+  % Dyn(A, F, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XPV_V, Ew, XPW_V): 
   % Discrete-time system of the form
   %
   %  x(k+1) = (A + ∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u(k) + F ...
@@ -8,8 +8,8 @@ classdef Dyn
   % u input such that (x(k),u(k)) ∈ XU
   % p(k) ∈ P measurable disturbance
   % d(k) ∈ D non-measurable disturbance
-  % v(k) ∈ conv_i(XV_V{i} [x(k); 1]) measurable state-dependent disturbance
-  % w(k) ∈ conv_i(XW_V{i} [x(k); 1]) non-measurable state-dependent disturbance
+  % v(k) ∈ conv_i(XPV_V{i} [x(k); p(k); 1]) measurable state-dependent disturbance
+  % w(k) ∈ conv_i(XPW_V{i} [x(k); p(k); 1]) non-measurable state-dependent disturbance
   %
   % INPUTS (all except A are optional)
   %
@@ -28,8 +28,8 @@ classdef Dyn
   % P:  np-dim Polyhedron
   % D:  nd-dim Pokyhedron
   %
-  % XV_V: cell of nv matrices of size (1 x nx+1)  
-  % XW_V: cell of nw matrices of size (1 x nx+1)  
+  % XV_V: cell of nv matrices of size (1 x nx+np+1)  
+  % XW_V: cell of nw matrices of size (1 x nx+np+1)  
   properties
     A;
     F;
@@ -137,12 +137,12 @@ classdef Dyn
 
       for i=1:length(d.XV_V)
         assert(size(d.Ev,2) == size(d.XV_V{i}, 1))
-        assert(size(d.A,2)+1 == size(d.XV_V{i}, 2))
+        assert(size(d.A,2)+d.np+1 == size(d.XV_V{i}, 2))
       end
 
       for i=1:length(d.XW_V)
         assert(size(d.Ew,2) == size(d.XW_V{i}, 1))
-        assert(size(d.A,2)+1 == size(d.XW_V{i}, 2))
+        assert(size(d.A,2)+d.np+1 == size(d.XW_V{i}, 2))
       end
     end
 
