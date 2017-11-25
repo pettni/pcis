@@ -3,7 +3,7 @@ mptopt('lpsolver', 'gurobi');
 % define constants
 con = constants;
 
-% Model 
+% Model (z forward speed)
 % \dot x = (A + Ap1/z + Ap2*z ) x + B u + E v
 
 A = [0 1 0 0;
@@ -27,22 +27,26 @@ Ap1 = [0 0 0 0;
        0 0 0 0;
        0 c42 0 c44];
 
-Ap2 = [0 0 1 0;
+Ap2 = [0 0 1  0;
        0 0 0 -1;
-       0 0 0 0;
-       0 0 0 0];
+       0 0 0  0;
+       0 0 0  0];
+
+Fp1 = zeros(4,1);
+Fp2 = zeros(4,1);
 
 % Over-approximation of parameters
 syms z;
 P = compute_hull([1/z, z], [con.u_min con.u_max], 1);
 
 % External disturbance
-% if con.u_max > con.u_min
-  % V_max = con.rd_max-(p2-con.u_min)*(con.rd_max-con.rd_min)/(con.u_max-con.u_min);
-% else
-  V_max = con.rd_max;
-  XV_V = {[0 0 0 0 -V_max], [0 0 0 0  V_max]};
-% end
+if con.rd_max > con.rd_min
+  V_max = con.rd_min - con.u_min*(con.rd_max-con.rd_min)/(con.u_max-con.u_min);
+  V_max_p2 = (con.rd_max-con.rd_min)/(con.u_max-con.u_min);
+  XV_V = {[0 0 0 0 0 V_max_p2 V_max], [0 0 0 0 0 -V_max_p2 -V_max]};
+else
+  XV_V = {[0 0 0 0 0 0 con.rd_max], [0 0 0 0 0 0 -con.rd_max]};
+end
 
 % Time discretization
 A_d  = eye(4) + con.dt * A;
@@ -52,12 +56,9 @@ Ev_d = con.dt * Ev;
 Ap1_d = con.dt*Ap1;
 Ap2_d = con.dt*Ap2;
 
-Fp1_d = zeros(4,1);
-Fp2_d = zeros(4,1);
-
 % Dyn object
 dyn = Dyn(A_d, [], B_d, XU, ...
-          {Ap1_d, Ap2_d}, {Fp1_d, Fp2_d}, P, ...
+          {Ap1_d, Ap2_d}, {Fp1, Fp2}, P, ...
           [], [], [], ...
           Ev_d, XV_V);
 

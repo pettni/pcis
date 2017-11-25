@@ -31,7 +31,7 @@ function con = constants
     
     con.df_max = deg2rad(20);        % control
     con.rd_max = 0.06 * con.u_min;   % inverse curvature at lowest speed
-    % con.rd_min = 0.06 * con.u_max;   % inverse curvature at highest speed
+    con.rd_min = 0.06 * con.u_max;   % inverse curvature at highest speed
 
     % Time discretization
     con.dt = 0.1;
