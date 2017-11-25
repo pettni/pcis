@@ -28,8 +28,8 @@ classdef Dyn
   % P:  np-dim Polyhedron
   % D:  nd-dim Pokyhedron
   %
-  % XV_V: cell of matrices of size (nv x nx+1)  
-  % XW_V: cell of matrices of size (nw x nx+1)  
+  % XV_V: cell of nv matrices of size (1 x nx+1)  
+  % XW_V: cell of nw matrices of size (1 x nx+1)  
   properties
     A;
     F;
