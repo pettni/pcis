@@ -1,4 +1,4 @@
-mptopt('lpsolver', 'gurobi');
+Bmptopt('lpsolver', 'gurobi');
 
 % define constants
 con = constants;
@@ -71,3 +71,10 @@ X = Polyhedron('A', [eye(4); -eye(4)], ...
                      con.y_max; con.nu_max; con.psi_max; con.r_max]);
 
 Cinv = dyn.win_always(X, con.rho_lk, 0, 1);
+
+if ~isEmptySet(Cinv)   
+   disp('finished computing with nonempty set!')   
+   poly_A = Ct.A;   
+   poly_b = Ct.b;    
+   save('results/lk_pcis_set', 'poly_A', 'poly_b', 'con') 
+end
