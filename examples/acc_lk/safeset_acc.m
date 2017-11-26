@@ -38,3 +38,9 @@ dyn = Dyn(A_d, F_d, B_d, XU, {Ap_d}, {Fp_d}, P);
 X = Polyhedron('H', [1 0 con.u_max; -1 0 -con.u_min; 0 -1 -con.h_min]);
 
 Cinv = dyn.win_always(X, con.rho_acc, 0, 1);
+
+if ~Cinv.isEmptySet
+  poly_A = Cinv.A;
+  poly_b = Cinv.b;
+  save('results/acc_cinv', 'poly_A', 'poly_b', 'con')
+end 

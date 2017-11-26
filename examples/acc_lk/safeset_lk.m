@@ -71,3 +71,9 @@ X = Polyhedron('A', [eye(4); -eye(4)], ...
                      con.y_max; con.nu_max; con.psi_max; con.r_max]);
 
 Cinv = dyn.win_always(X, con.rho_lk, 0, 1);
+
+if ~Cinv.isEmptySet
+  poly_A = Cinv.A;
+  poly_b = Cinv.b;
+  save('results/lk_cinv', 'poly_A', 'poly_b', 'con')
+end 
