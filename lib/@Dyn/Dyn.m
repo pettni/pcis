@@ -1,19 +1,20 @@
 classdef Dyn
-  % Dyn(A, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XV_V, Ew, XW_V): 
+  % Dyn(A, F, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XPV_V, Ew, XPW_V): 
   % Discrete-time system of the form
   %
-  %  x(k+1) = (A + ∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u(k) ...
+  %  x(k+1) = (A + ∑d_i Ad{i} + ∑p_i Ap{i}) x(k) + B u(k) + F ...
   %           + ∑d_i(k) Fd{i} + ∑p_i(k) Fp{i} + Ev v(k) + Ew w(k)
   %
   % u input such that (x(k),u(k)) ∈ XU
   % p(k) ∈ P measurable disturbance
   % d(k) ∈ D non-measurable disturbance
-  % v(k) ∈ conv_i(XV_V{i} [x(k); 1]) measurable state-dependent disturbance
-  % w(k) ∈ conv_i(XW_V{i} [x(k); 1]) non-measurable state-dependent disturbance
+  % v(k) ∈ conv_i(XPV_V{i} [x(k); p(k); 1]) measurable state-dependent disturbance
+  % w(k) ∈ conv_i(XPW_V{i} [x(k); p(k); 1]) non-measurable state-dependent disturbance
   %
   % INPUTS (all except A are optional and can be set later)
   %
   % A: (nx x nx) matrix
+  % F: (nx x 1) matrix
   % B: (nx x nu) matrix
   % Ev: (nx x nv) matrix
   % Ew: (nx x nw) matrix
@@ -27,10 +28,11 @@ classdef Dyn
   % P:  np-dim Polyhedron
   % D:  nd-dim Pokyhedron
   %
-  % XV_V: cell of matrices of size (nv x nx+1)  
-  % XW_V: cell of matrices of size (nw x nx+1)  
+  % XV_V: cell of nv matrices of size (1 x nx+np+1)  
+  % XW_V: cell of nw matrices of size (1 x nx+np+1)  
   properties
     A;
+    F;
     B;
     XU;
     Ap;
@@ -47,13 +49,19 @@ classdef Dyn
 
   methods
     % Constructor
-    function d = Dyn(A, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XV_V, Ew, XW_V)
+    function d = Dyn(A, F, B, XU, Ap, Fp, P, Ad, Fd, D, Ev, XV_V, Ew, XW_V)
 
       nx = size(A,2);
 
       d.A = A;
 
-      if nargin < 2 || isempty(B)
+      if nargin < 2 || isempty(F)
+        d.F = zeros(nx,1);
+      else
+        d.F = F;
+      end
+
+      if nargin < 3 || isempty(B)
         d.B = zeros(nx,0);
         d.XU = Polyhedron('H', [zeros(1,nx) 1]);
       else
@@ -61,7 +69,7 @@ classdef Dyn
         d.XU = XU;
       end
 
-      if nargin < 4 || isempty(Ap)
+      if nargin < 5 || isempty(Ap)
         d.Ap = {};
         d.Fp = {};
         d.P = Polyhedron; 
@@ -71,7 +79,7 @@ classdef Dyn
         d.P = P;
       end
 
-      if nargin < 7 || isempty(Ad)
+      if nargin < 8 || isempty(Ad)
         d.Ad = {};
         d.Fd = {};
         d.D = Polyhedron; 
@@ -81,7 +89,7 @@ classdef Dyn
         d.D = D;
       end
 
-      if nargin < 10 || isempty(Ev)
+      if nargin < 11 || isempty(Ev)
         d.Ev = zeros(nx,0);
         d.XV_V = {};
       else
@@ -89,7 +97,7 @@ classdef Dyn
         d.XV_V = XV_V;
       end
 
-      if nargin < 12 || isempty(Ew)
+      if nargin < 14 || isempty(Ew)
         d.Ew = zeros(nx,0);
         d.XW_V = {};
       else
@@ -101,6 +109,7 @@ classdef Dyn
     function check(d)
       % Checks
       assert(size(d.A, 1) == size(d.A,2))
+      assert(size(d.F, 1) == size(d.A,1))
       assert(size(d.B, 1) == size(d.A,1))
       assert(size(d.Ew, 1) == size(d.A,1))
       assert(size(d.Ev, 1) == size(d.A,1))
@@ -128,12 +137,12 @@ classdef Dyn
 
       for i=1:length(d.XV_V)
         assert(size(d.Ev,2) == size(d.XV_V{i}, 1))
-        assert(size(d.A,2)+1 == size(d.XV_V{i}, 2))
+        assert(size(d.A,2)+d.np+1 == size(d.XV_V{i}, 2))
       end
 
       for i=1:length(d.XW_V)
         assert(size(d.Ew,2) == size(d.XW_V{i}, 1))
-        assert(size(d.A,2)+1 == size(d.XW_V{i}, 2))
+        assert(size(d.A,2)+d.np+1 == size(d.XW_V{i}, 2))
       end
     end
 

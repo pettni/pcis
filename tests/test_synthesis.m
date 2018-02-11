@@ -14,7 +14,7 @@ end
 
 function testAlways2(testCase)
   XU = Polyhedron('H', [0 0 1 0 0.1; 0 0 -1 0 0.1; 0 0 0 1 0.1; 0 0 0 -1 0.1]);
-  d = Dyn([1 0.2; 0.2 1], eye(2), XU);
+  d = Dyn([1 0.2; 0.2 1], [], eye(2), XU);
   X0 = Polyhedron([eye(2); -eye(2)], ones(4,1));
   W = d.win_always(X0, 0.001);
   testCase.assertThat(W <= 1.01*Polyhedron('V', [1 0; 0 1; -1 1; -1 0; 0 -1; 1 -1]), ...

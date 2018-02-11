@@ -17,7 +17,7 @@ Add the `lib` folder to the Matlab path. Execute `runtests` in the `tests` folde
 ## TODO list
 
  - Add 3D ACC example
- - Add LK/ACC example
+ - Work out theory for w,v disturbance that is both p-dependent and x-dependent. Is there a conflict? 
 
 ## Longer term objectives
 

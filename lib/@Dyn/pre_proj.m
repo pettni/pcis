@@ -31,18 +31,22 @@ function [ X0 ] = pre_proj(dyn, X, rho)
   proj = cell(N_P * N_V, 1);
 
   % For each (p,v) combination
-  parfor iter=1:N_P*N_V
+  for iter=1:N_P*N_V
     ip = 1+mod(iter-1, N_P);    % idx p
     iv = 1+floor((iter-1)/N_P); % idx v
 
     A_mat_p = dyn.A;
-    F_mat_p = zeros(dyn.nx, 1);
+    F_mat_p = dyn.F;
 
     if dyn.nv > 0
       vext_x = dyn.XV_V{iv}(:, 1:dyn.nx);
-      vext_v = dyn.XV_V{iv}(:, dyn.nx+1:end);
+      vext_v = dyn.XV_V{iv}(:, dyn.nx+dyn.np+1:end);
       A_mat_p = A_mat_p + dyn.Ev * vext_x;
       F_mat_p = F_mat_p + dyn.Ev * vext_v;
+      if dyn.np > 0
+        vext_p = dyn.XV_V{iv}(:, dyn.nx+1:dyn.nx+dyn.np);
+        F_mat_p = F_mat_p + dyn.Ev * vext_p*PV(ip, :)';
+      end
     end
 
     for jp=1:dyn.np
@@ -65,11 +69,17 @@ function [ X0 ] = pre_proj(dyn, X, rho)
         % For each w
         for iw=1:length(dyn.XW_V)
           wext_x = dyn.XW_V{iw}(:, 1:dyn.nx);
-          wext_w = dyn.XW_V{iw}(:, dyn.nx+1:end);
+          wext_p = dyn.XW_V{iv}(:, dyn.nx+1:dyn.nx+dyn.np);
+          wext_w = dyn.XW_V{iw}(:, dyn.nx+dyn.np+1:end);
           Xd_A = [Xd_A; 
                   Xb.A*[A_mat_pd+dyn.Ew*wext_x dyn.B]];
-          Xd_b = [Xd_b; 
-                  Xb.b-Xb.A*(F_mat_pd+dyn.Ew*wext_w)];
+          if dyn.np > 0
+            Xd_b = [Xd_b; 
+                    Xb.b-Xb.A*(F_mat_pd+dyn.Ew*(wext_p*PV(ip,:)'+wext_w))];
+          else
+            Xd_b = [Xd_b; 
+                    Xb.b-Xb.A*(F_mat_pd+dyn.Ew*wext_w)];
+          end
         end
       else
         Xd_A = [Xd_A; 
