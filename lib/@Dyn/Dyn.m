@@ -11,7 +11,7 @@ classdef Dyn
   % v(k) ∈ conv_i(XV_V{i} [x(k); 1]) measurable state-dependent disturbance
   % w(k) ∈ conv_i(XW_V{i} [x(k); 1]) non-measurable state-dependent disturbance
   %
-  % INPUTS (all except A are optional)
+  % INPUTS (all except A are optional and can be set later)
   %
   % A: (nx x nx) matrix
   % B: (nx x nu) matrix
