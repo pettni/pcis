@@ -31,7 +31,7 @@ function [ X0 ] = pre_proj(dyn, X, rho)
   proj = cell(N_P * N_V, 1);
 
   % For each (p,v) combination
-  for iter=1:N_P*N_V
+  parfor iter=1:N_P*N_V
     ip = 1+mod(iter-1, N_P);    % idx p
     iv = 1+floor((iter-1)/N_P); % idx v
 
