@@ -10,6 +10,15 @@ This is an ongoing effort to combine code for polyhedral synthesis methods (subs
 
 ## Requirements
  - Recent version of Matlab and MPT 3.0 (http://control.ee.ethz.ch/~mpt).
+ - Optional: Mosek for more efficient LP solving
+
+To set up MPT to use Mosek:
+
+``` 
+ addpath /path/to/mosek/toolbox/r2014a
+ savepath
+ mpt_init 
+```
 
 ## Installation
 Add the `lib` folder to the Matlab path. Execute `runtests` in the `tests` folder to make sure everything works correctly. Optional: set up MPT to use a commercial solver.
