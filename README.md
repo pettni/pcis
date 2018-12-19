@@ -30,6 +30,6 @@ Add the `lib` folder to the Matlab path. Execute `runtests` in the `tests` folde
 
 ## Longer term objectives
 
- - Implementation of `minHRep` that scales with size of output as opposed to input
+ - Integration of `minHRep` that scales better: https://github.com/mageecoe/indicate_nonredundant_halfplanes
  - `Pre` with pre-defined template with complexity bound
  - Algorithms for merging non-convex polyhedral unions
