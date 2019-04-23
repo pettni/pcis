@@ -9,7 +9,7 @@ function testAlways1(testCase)
   X0 = Polyhedron([eye(2); -eye(2)], ones(4,1));
   W = d.win_always(X0, 0.001);
   cc = W.chebyCenter;
-  testCase.assertEqual(cc.r, 1)
+  testCase.assertEqual(cc.r, 1, 'RelTol', 1e-5)
 end
 
 function testAlways2(testCase)
@@ -23,6 +23,3 @@ function testAlways2(testCase)
                       matlab.unittest.constraints.IsTrue)
 
 end
-
-
-
