@@ -92,9 +92,18 @@ function [ X0 ] = pre_proj(dyn, X, rho)
                           'b', [Xd_b; dyn.XU.b]);
     
     proj{iter} = projection(pre_proj, 1:dyn.nx);
-    proj{iter}.minHRep;
+
+    if false
+      proj{iter}.minHRep;
+    else
+      proj{iter} = minHRepFast(proj{iter});
   end
 
   X0 = Polyhedron('H', cell2mat(cellfun(@(p) p.H, proj, 'UniformOutput', false)));
-  X0.minHRep;
+
+  if false
+    X0.minHRep;
+  else
+    X0 = minHRepFast(X0);
+  end
 end

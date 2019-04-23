@@ -1,0 +1,3 @@
+[submodule "indicate_nonredundant_halfplanes"]
+	path = indicate_nonredundant_halfplanes
+	url = https://github.com/mageecoe/indicate_nonredundant_halfplanes.git
