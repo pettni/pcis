@@ -171,6 +171,10 @@ classdef Dyn
       end
       X0 = pre_proj(d, X, rho);
     end
+
+    function r = is_statedep_input(d)
+      r = norm(d.XU.A(:, 1:d.nx)) > 0;
+    end
   end
 end
 

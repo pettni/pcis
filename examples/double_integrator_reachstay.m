@@ -2,7 +2,7 @@
 % reaching the maximal controlled invariant set contained in { (x,v) : x \in [-1, 1] }
 % for the double-integrator system
 
-% System matrices, state = [x; dx; ddx]
+% System matrices, state = [x; dx]
 A = [0 1;
      0 0];
 B = [0;1];
