@@ -4,7 +4,7 @@
 A = [0 1;
      0 0];
 B = [0;1];
-
+F = [0.1;0];
 % Bounds
 xmax = 1;
 umax = 1;
@@ -17,20 +17,19 @@ dt = 0.1;
 
 Adt = expm(A*dt);
 Bdt = dt*B;
+Fdt = dt*F;
 
 XU = Polyhedron('H', [0 0 1 umax;
 				      0 0 -1 umax]);
 
-d = Dyn(Adt, [0.01; 0.0], Bdt, XU);
+d = Dyn(Adt, Fdt, Bdt, XU);
 
 S = Polyhedron('A', [eye(2); -eye(2)], 'b', [xmax; xmax; xmax; xmax]);
 
 N = 20;
 
 % Compute attractor defining invariant set
-tic
-X0 = d.win_always_oneshot_small(S, N, 0.1);
-toc
+X0 = d.win_always_oneshot_small(S, N, 0.15);
 
 % Now X0 should be contained in pre^N(X0, S) for pre(X, S) := S ∩ pre(X)
 

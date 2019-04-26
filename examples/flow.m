@@ -22,16 +22,23 @@ H_xu = [zeros(nu, nx) -eye(nu) zeros(nu, 1);
          0  0  0  0 -1    0  0  0  0  1  0      0];
 XU = Polyhedron('H', H_xu);
 
+
 % safe set
-S = Polyhedron('A', [-eye(5); ones(1,nx)], 'b', [zeros(nx,1); 10]);
+S = Polyhedron('A', [-eye(nx); ones(1,nx)], 'b', [zeros(nx,1); 20]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 d = Dyn(A, F, B, XU);
 
-N = 30;
+N = 4;
 
 % Compute attractor defining invariant set
-tic
-X0 = d.win_always_oneshot_small(S, N, 0.01);
-toc
+X0 = dyn.win_always_oneshot_small(S, N, 0.01);
+
+clf; hold on
+X = X0;
+plot(projection(X0, 1:3), 'alpha', 0.7, 'linestyle', 'none')
+for i=1:N
+	X = intersect(S, d.pre(X));
+	plot(projection(X, 1:3), 'alpha', 0.1)
+end
