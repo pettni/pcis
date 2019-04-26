@@ -1,16 +1,19 @@
 % Finding a controlled invariant set via a one-shot method
 
-% System matrices, state = [x; dx]
-A = [0 1;
-     0 0];
-B = [0;1];
+% System matrices, state = [x; dx; ddx]
+A = [0 1 0;
+     0 0 1;
+     0 0 0];
+B = [0;0;1];
 
 % Bounds
 xmax = 1;
+dxmax = 1;
+ddxmax = 1;
 umax = 1;
 
 % Time discretization
-dt = 0.1;
+dt = 0.25;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -18,19 +21,19 @@ dt = 0.1;
 Adt = expm(A*dt);
 Bdt = dt*B;
 
-XU = Polyhedron('H', [0 0 1 umax;
-				      0 0 -1 umax]);
+S = Polyhedron('A', [eye(3); -eye(3)], 'b', [xmax; dxmax; ddxmax; xmax; dxmax; ddxmax]);
 
-d = Dyn(Adt, [0.01; 0.0], Bdt, XU);
+XU = Polyhedron('H', [0 0 0 1 umax;
+				      0 0 0 -1 umax]);
 
-S = Polyhedron('A', [eye(2); -eye(2)], 'b', [xmax; xmax; xmax; xmax]);
+d = Dyn(Adt, [], Bdt, XU);
 
 N = 20;
 
 % Compute attractor defining invariant set
-tic
-X0 = d.win_always_oneshot_small(S, N, 0.1);
-toc
+% tic
+X0 = d.win_always_oneshot(S, N, 0.1);
+% toc
 
 % Now X0 should be contained in pre^N(X0, S) for pre(X, S) := S ∩ pre(X)
 
@@ -39,14 +42,11 @@ clf; hold on
 X = X0;
 for i=1:N
 	X = intersect(S, d.pre(X));
-	plot(X, 'alpha', 0.1)
+	plot(X, 'alpha', 0.1, 'linestyle', 'none')
 end
 
 % Plot auxiliary sets
-plot(X0, 'linestyle', '--', 'alpha', 0)
+plot(X0, 'color', 'blue', 'alpha', 0.5)
 plot(S, 'edgecolor', 'blue', 'alpha', 0)
-
-% Compare with maximal
-plot(d.win_always(S), 'edgecolor', 'green', 'alpha', 0)
 
 axis equal

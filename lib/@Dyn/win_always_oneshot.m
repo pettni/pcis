@@ -1,29 +1,29 @@
 function [result] = win_always_oneshot(dyn, X, N, eps)
-  % One-shot search for maximal invariant set contained in X 
-  % 
-  % by looking for a set P such that P
-  % P ⊆ pre^N(P, X),    where pre(P, X) = X ∩ pre(P)
-  % which is sufficient for existence of a control-invariant set
-  %
-  % Reference: Fiacchini, M., & Alamir, M. (2018). Computing control 
-  %            invariant sets in high dimension is easy.
-  %            http://arxiv.org/abs/1810.10372
+% One-shot search for maximal invariant set contained in X 
+% 
+% by looking for a set P such that P
+% P ⊆ pre^N(P, X),    where pre(P, X) = X ∩ pre(P)
+% which is sufficient for existence of a control-invariant set
+%
+% Reference: Fiacchini, M., & Alamir, M. (2018). Computing control 
+%            invariant sets in high dimension is easy.
+%            http://arxiv.org/abs/1810.10372
 
   if nargin < 4
   	eps = 1e-3;
   end
 
-  P = Polyhedron('A', [eye(dyn.nx); -eye(dyn.nx)], 'b', ones(2*dyn.nx, 1));
+  P = Polyhedron('A', [eye(dyn.nx); -eye(dyn.nx)], 'b', eps*ones(2*dyn.nx, 1));
 
   if dyn.is_statedep_input()
-  	error("method does not support state-dependent input bounds");
+  	error("state-dependent input bounds not implemented");
   end
 
   if dyn.np > 0 || dyn.nv > 0
   	error("method does not support parameters");
   end
 
-  if dyn.nd || dyn.nw > 0
+  if dyn.nd > 0 || dyn.nw > 0
   	error("method does not support disturbance");
   end
 
@@ -122,11 +122,8 @@ function [result] = win_always_oneshot(dyn, X, N, eps)
          -eye(sizeTvec+1) zeros(sizeTvec+1, sizeMvec)];
   biq = [c2_b; zeros(sizeTvec+1, 1)];
 
-  f = zeros(1, 1 + sizeTvec + sizeMvec);
-  f(1) = 1;
+  f = [1 zeros(1, sizeTvec + sizeMvec)];
 
-  options = mskoptimset('');
-
-  [x, fval, exitflag] = linprog(f, Aiq, biq, Aeq, beq, [], [], [], options);
+  [x, fval, exitflag] = linprog(f, Aiq, biq, Aeq, beq);
 
   result = (1/fval) * P;
