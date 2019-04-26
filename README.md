@@ -3,10 +3,13 @@
 This is an ongoing effort to combine code for polyhedral synthesis methods (subsume the repositories `cps-inv`, `multi-cinv` and parts of `mkz`). List of capabilities:
 
  - Pre algorithms via robust counterpart and intersection/projection
- - Invariance algorithm with termination guarantee
- - Measurable and non-measurable disturbance
- - Parametrized/disturbed A matrix
- - State-dependent disturbance
+ - Iterative invariance algorithm with termination guarantee
+   - State-dependent input bounds
+   - Measurable and non-measurable disturbance
+   - Parametrized/disturbed A matrix
+   - State-dependent disturbance
+ - One-shot search for implicit controlled-invariant sets
+   - State-dependent input bounds
 
 ## Requirements
  - Recent version of Matlab and MPT 3.0 (http://control.ee.ethz.ch/~mpt).
