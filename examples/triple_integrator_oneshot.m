@@ -34,10 +34,10 @@ N = 20;
 
 % Compute attractor defining invariant set
 % tic
-X0 = d.win_always_oneshot_small(S, N, 0.1);
+X0 = d.win_always_oneshot(S, N, 0.1);
 % toc
 
-% Now X0 should be contained in pre^N(X0, S) for pre(X, S) := S ∩ pre(X)
+% Now X0 is contained in pre^N(X0, S) for pre(X, S) := S ∩ pre(X)
 
 % Plot the iterations
 clf; hold on

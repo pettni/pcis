@@ -33,12 +33,12 @@ d = Dyn(A, F, B, XU);
 N = 4;
 
 % Compute attractor defining invariant set
-X0 = dyn.win_always_oneshot_small(S, N, 0.01);
+X0 = dyn.win_always_oneshot(S, N, 0.01);
 
 clf; hold on
 X = X0;
-plot(projection(X0, 1:3), 'alpha', 0.7, 'linestyle', 'none')
+plot(projection(X0, 3:5), 'alpha', 0.7, 'linestyle', 'none')
 for i=1:N
 	X = intersect(S, d.pre(X));
-	plot(projection(X, 1:3), 'alpha', 0.1)
+	plot(projection(X, 3:5), 'alpha', 0.1)
 end

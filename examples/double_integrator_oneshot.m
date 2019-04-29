@@ -29,7 +29,7 @@ S = Polyhedron('A', [eye(2); -eye(2)], 'b', [xmax; xmax; xmax; xmax]);
 N = 20;
 
 % Compute attractor defining invariant set
-X0 = d.win_always_oneshot_small(S, N, 0.15);
+X0 = d.win_always_oneshot(S, N, 0.15);
 
 % Now X0 should be contained in pre^N(X0, S) for pre(X, S) := S ∩ pre(X)
 
