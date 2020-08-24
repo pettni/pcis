@@ -25,14 +25,3 @@ To set up MPT to use Mosek:
 
 ## Installation
 Add the `lib` folder to the Matlab path. Execute `runtests` in the `tests` folder to make sure everything works correctly. Optional: set up MPT to use a commercial solver.
-
-## TODO list
-
- - Add 3D ACC example
- - Work out theory for w,v disturbance that is both p-dependent and x-dependent. Is there a conflict? 
-
-## Longer term objectives
-
- - Integration of `minHRep` that scales better: https://github.com/mageecoe/indicate_nonredundant_halfplanes
- - `Pre` with pre-defined template with complexity bound
- - Algorithms for merging non-convex polyhedral unions
